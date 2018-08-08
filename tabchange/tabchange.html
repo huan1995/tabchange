@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" style="font-size: 20px;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tabchange Demo</title>
+    <style>
+        *{margin:0;padding: 0;}
+        ul,li{list-style: none;}
+        a{color: #000;}
+        .header{text-align: center;margin-top: 50px;}
+        .container{margin:20px 0 0 8%;width:80%;padding: 10px;float: left;}
+        .container>*{float: left;}
+        .container>.tabMenu{width: 20%;}
+        .container>.tabContent{width: 70%;border-left: 1px solid;min-height:300px;padding-left: 20px;}
+        .active>a{color:#f00}
+        .key{color:#666;font-size: 24px;}
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header class="header">
+            <h1 v-if="!isLoad">{{title}}</h1>
+            <h1 v-else style="margin-top:200px;">Loading....</h1>
+        </header>
+        <section class="container" v-if="!isLoad">
+            <section class="tabMenu">
+                <ul>
+                    <li v-for="(item,idx) of items" :class="{active:idx==activeTab}" @click="tabChange(idx)">
+                        <a href="javascript:">{{item.name}}</a>
+                    </li>
+                </ul>
+            </section>
+            <section class="tabContent">
+                <section v-for="(item,idx) of items" v-if="idx==activeTab">
+                    <p v-for="(val,key) in item">
+                        <span class="key">{{key}}:</span>{{val}}
+                    </p>
+                </section>
+            </section>
+        </section>
+    </div>
+    
+    <script src="https://unpkg.com/vue@2.5.17/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/vue-resource@1.5.1/dist/vue-resource.min.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                isLoad:true,
+                activeTab: 0,
+                title: "",
+                items:[]
+            },
+            methods: {
+                init() {
+                    this.$http.get('https://api.myjson.com/bins/huan')
+                        .then(resp => {
+                            if (resp.status === 200) {
+                                this.isLoad=false;
+                                this.title = resp.body.name;
+                                this.items=resp.body.tracks;
+                            }
+                        })
+                        .catch(err => {
+
+                        })
+                },
+                tabChange(idx) {
+                    this.activeTab=idx;
+                }
+            },
+            mounted() {
+                this.init()
+            },
+        })
+    </script>
+</body>
+
+</html>
